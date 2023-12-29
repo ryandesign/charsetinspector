@@ -59,9 +59,8 @@ COLS        =          40
 WIDTH       =          16
 HEIGHT      =          16
 
+KEYRETURN   =         $8D       ;return keycode
 KEYESC      =         $9B       ;esc keycode
-KEY1        =         $B1       ;1 keycode
-KEY2        =         $B2       ;2 keycode
 
 ;define a string in which every char except the last one has the high bit set
 .macro defstr name, str
@@ -98,7 +97,7 @@ defstr "iigs",      "IIGS"
 defstr "primary",   "Primary "
 defstr "alternate", "Alternate "
 defstr "charset",   "character set"
-defstr "tochange",  "1 or 2 = change charset; "
+defstr "tochange",  "Return = change charset; "
 defstr "toexit",    "Esc = exit"
 
 .code
@@ -180,14 +179,14 @@ defstr "toexit",    "Esc = exit"
 @clearkey:  sta KBDSTRB         ;indicate keypress was handled
 @key:       lda KBD             ;check keyboard
             bpl @key            ;if no keypress, loop
-            cmp #KEY1           ;if 1 key pressed
-            bne @check2
-@clralt:    sta CLRALTCHAR      ; select primary character set
+            cmp #KEYRETURN      ;if return key pressed, toggle charset
+            bne @checkesc
+            bit ALTCHARSET      ;check current charset
+            bpl @setalt
+@clralt:    sta CLRALTCHAR      ;select primary character set
             ldy #$0
             bpl @store          ;always
-@check2:    cmp #KEY2           ;if 2 key pressed
-            bne @checkesc
-@setalt:    sta SETALTCHAR      ; select alternate character set
+@setalt:    sta SETALTCHAR      ;select alternate character set
             ldy #$FF
             bmi @store          ;always
 @checkesc:  cmp #KEYESC         ;if esc key pressed
