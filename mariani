@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: © 2025 Ryan Carsten Schmidt <https://github.com/ryandesign>
+# SPDX-License-Identifier: MIT
+
+set -eu
+
+if [ $# -ge 1 ]; then
+    case $1 in
+        /*) d1="$1";;
+        *)  d1="$(pwd)/$1";;
+    esac
+    if [ ! -r "$d1" ]; then
+        printf "file not found: %s\n" "$1" 1>&2
+        exit 1
+    fi
+    if pgrep -l '^Mariani$' > /dev/null; then
+        exec osascript \
+            -e 'on run args' \
+            -e '    tell application "Mariani"' \
+            -e '        insert item 1 of args into Drive 1 of Slot 6' \
+            -e '        activate' \
+            -e '        reboot' \
+            -e '    end tell' \
+            -e 'end run' \
+            "$d1"
+    else
+        set -- --d1 "$d1"
+    fi
+fi
+exec open -a Mariani --args "$@"

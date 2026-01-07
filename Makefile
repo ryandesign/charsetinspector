@@ -18,7 +18,7 @@ play: $(PROG).aif
 	afplay $^
 
 run: $(PROG).dsk
-	./openemulator.applescript $^
+	./mariani $^
 
 $(PROG): $(PROG).as
 	applesingle decode -o $@.$$$$ $^ && touch $@.$$$$ && mv $@.$$$$ $@
